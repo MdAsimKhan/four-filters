@@ -80,13 +80,29 @@ faceTrackerGroup.add(mask);
 
 // Load a 3D model to place within our group (using ThreeJS's GLTF loader)
 // Pass our loading manager in to ensure the progress bar works correctly
-const helmetSrc = new URL('../assets/z_helmet.glb', import.meta.url).href;
+const helmetSrc = new URL('../assets/racer_helmet.glb', import.meta.url).href;
 const gltfLoader = new GLTFLoader(manager);
 gltfLoader.load(helmetSrc, (gltf) => {
   // Position the loaded content to overlay user's face
-  gltf.scene.position.set(0.3, -1.3, 0);
-  gltf.scene.scale.set(1.1, 1.1, 1.1);
+  
+  // 1. FACE HELMET (RACER)
+  // gltf.scene.position.set(0, -0.8, 0);
+  // gltf.scene.scale.set(2.3, 2.3, 2.3);
+  // gltf.scene.rotation.set(0, Math.PI, 0);
 
+  // 2. SUNGLASS
+  // but problem with other models
+  // gltf.scene.position.set(0, 0.21, 1);
+  // gltf.scene.scale.set(0.022, 0.022, 0.03);
+
+  // 3. CHEEK PAINT
+  // in face-mesh example
+
+  // 4. FULL HEAD COVER (ASTRONAUT HELMET)
+  // gltf.scene.position.set(0, -1, -0.35);
+  // gltf.scene.scale.set(0.06, 0.06, 0.1);
+
+  console.log(gltf.scene)
   // Add the scene to the tracker group
   faceTrackerGroup.add(gltf.scene);
 }, undefined, () => {
