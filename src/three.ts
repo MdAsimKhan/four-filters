@@ -7,7 +7,8 @@
 import * as ZapparThree from '@zappar/zappar-threejs';
 import * as THREE from 'three';
 import './index.css';
-import ZapparWebGLSnapshot from '@zappar/webgl-snapshot';
+import ZapparSharing from '@zappar/sharing';
+import * as ZapparVideoRecorder from '@zappar/video-recorder';
 
 const faceTextureTemplate = new URL('../assets/cheek_paint.png', import.meta.url).href;
 
@@ -101,19 +102,64 @@ scene.add(ambeintLight);
 faceTrackerGroup.faceTracker.onVisible.bind(() => { faceTrackerGroup.visible = true; });
 faceTrackerGroup.faceTracker.onNotVisible.bind(() => { faceTrackerGroup.visible = false; });
 
-// Get a reference to the 'Snapshot' button so we can attach a 'click' listener
-const placeButton = document.getElementById('snapshot') || document.createElement('div');
+// snapshot
+const snapButton = document.getElementById('snapshot') || document.createElement('div');
 
-placeButton.addEventListener('click', () => {
-  // Get canvas from dom
-  const canvas = document.querySelector('canvas') || document.createElement('canvas');
+snapButton.addEventListener("click", () => {
 
-  // Convert canvas data to url
-  const url = canvas.toDataURL();
+  // Create an image from the canvas
+  const planeGeometry = new THREE.PlaneGeometry(2, 2);
+  const planeMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+  const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
+  scene.add(planeMesh);
 
-  // Take snapshot
-  ZapparWebGLSnapshot({
-    data: url,
+  // Temporarily set the camera to focus on the planeMesh
+  const originalCameraPosition = camera.position.clone();
+  camera.position.set(
+    planeMesh.position.x,
+    planeMesh.position.y,
+    planeMesh.position.z + 5
+  );
+
+  camera.lookAt(planeMesh.position);
+
+  // Render the scene
+  renderer.render(scene, camera);
+
+  // Capture the rendered image from the main renderer
+  // const screenshotImage = new Image();
+  const dataURL = renderer.domElement.toDataURL("image/png");
+
+    // Take snapshot
+  ZapparSharing({
+    data: dataURL,
+  });
+
+  // Reset the camera and visibility of the planeMesh
+  camera.position.copy(originalCameraPosition);
+  camera.lookAt(0, 0, 0);
+});
+
+// video capture
+const vidButton = document.getElementById('videocapture') || document.createElement('div');
+const stopButton = document.getElementById('stopcapture') || document.createElement('div');
+
+const canvas = document.querySelector('canvas') || document.createElement('canvas');
+
+ZapparVideoRecorder.createCanvasVideoRecorder(canvas, {
+}).then((recorder) => {
+  vidButton.addEventListener('click', () => {
+    recorder.start();
+  });
+
+  stopButton.addEventListener('click', () => {
+    recorder.stop();
+  });
+
+  recorder.onComplete.bind(async (res) => {
+    ZapparSharing({
+      data: await res.asDataURL(),
+    });
   });
 });
 

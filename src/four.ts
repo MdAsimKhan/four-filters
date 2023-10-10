@@ -6,7 +6,8 @@
 import * as THREE from 'three';
 import * as ZapparThree from '@zappar/zappar-threejs';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-import ZapparWebGLSnapshot from '@zappar/webgl-snapshot';
+import ZapparSharing from '@zappar/sharing';
+import * as ZapparVideoRecorder from '@zappar/video-recorder';
 
 import './index.css';
 
@@ -111,9 +112,9 @@ faceTrackerGroup.faceTracker.onVisible.bind(() => { faceTrackerGroup.visible = t
 faceTrackerGroup.faceTracker.onNotVisible.bind(() => { faceTrackerGroup.visible = false; });
 
 // Get a reference to the 'Snapshot' button so we can attach a 'click' listener
-const placeButton = document.getElementById('snapshot') || document.createElement('div');
+const snapButton = document.getElementById('snapshot') || document.createElement('div');
 
-placeButton.addEventListener('click', () => {
+snapButton.addEventListener('click', () => {
   // Get canvas from dom
   const canvas = document.querySelector('canvas') || document.createElement('canvas');
 
@@ -121,8 +122,31 @@ placeButton.addEventListener('click', () => {
   const url = canvas.toDataURL('image/jpeg', 0.8);
 
   // Take snapshot
-  ZapparWebGLSnapshot({
+  ZapparSharing({
     data: url,
+  });
+});
+
+// video capture
+const vidButton = document.getElementById('videocapture') || document.createElement('div');
+const stopButton = document.getElementById('stopcapture') || document.createElement('div');
+
+const canvas = document.querySelector('canvas') || document.createElement('canvas');
+
+ZapparVideoRecorder.createCanvasVideoRecorder(canvas, {
+}).then((recorder) => {
+  vidButton.addEventListener('click', () => {
+    recorder.start();
+  });
+
+  stopButton.addEventListener('click', () => {
+    recorder.stop();
+  });
+
+  recorder.onComplete.bind(async (res) => {
+    ZapparSharing({
+      data: await res.asDataURL(),
+    });
   });
 });
 
