@@ -88,6 +88,9 @@ const faceMeshMesh = new THREE.Mesh(faceBufferGeometry, new THREE.MeshStandardMa
 }));
 faceTrackerGroup.add(faceMeshMesh);
 
+// bindi
+// faceMeshMesh.position.set(0, 0.2, 0);
+
 // Let's add some lighting, first a directional light above the model pointing down
 const directionalLight = new THREE.DirectionalLight('white', 0.8);
 directionalLight.position.set(0, 5, 0);

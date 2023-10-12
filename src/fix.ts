@@ -1,4 +1,4 @@
-// snapshot
+// Get a reference to the 'Snapshot' button so we can attach a 'click' listener
 const snapButton = document.getElementById('snapshot') || document.createElement('div');
 
 snapButton.addEventListener("click", () => {
